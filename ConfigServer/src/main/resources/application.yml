@@ -1,0 +1,23 @@
+server:
+  port: 9296
+
+spring:
+  application:
+    name: CONFIG-SERVER
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/ConfidenceDev/spring-app-config
+          username: ${GITHUB_USERNAME:ConfidenceDev}
+          password: ${GITHUB_TOKEN}
+          clone-on-start: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    server-url:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}

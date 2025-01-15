@@ -1,0 +1,17 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: COMPANY-SERVICE
+  h2:
+    console:
+      enabled: true
+      path: /db
+  datasource:
+    url: jdbc:h2:mem:company
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
