@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apigateway-app
+spec:
+  selector:
+    matchLabels:
+      app: apigateway-app
+  template:
+    metadata:
+      labels:
+        app: apigateway-app
+    spec:
+      containers:
+        - name: apigateway-app
+          image: confidencedev/apigateway
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9090
+          env:
+            - name: CONFIG_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: EUREKA_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apigateway-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: apigateway-app
+  ports:
+    - port: 80
+      targetPort: 9090

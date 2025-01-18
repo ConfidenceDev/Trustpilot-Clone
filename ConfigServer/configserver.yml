@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configserver-app
+spec:
+  selector:
+    matchLabels:
+      app: configserver-app
+  template:
+    metadata:
+      labels:
+        app: configserver-app
+    spec:
+      containers:
+        - name: configserver-app
+          image: confidencedev/configserver
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9296
+          env:
+            - name: EUREKA_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_service
+            - name: GITHUB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: github-cm
+                  key: username
+            - name: GITHUB_TOKEN
+              valueFrom:
+                configMapKeyRef:
+                  name: github-cm
+                  key: token
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: configserver-svc
+spec:
+  selector:
+    app: configserver-app
+  ports:
+    - port: 80
+      targetPort: 9296

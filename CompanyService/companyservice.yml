@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: company-app
+spec:
+  selector:
+    matchLabels:
+      app: company-app
+  template:
+    metadata:
+      labels:
+        app: company-app
+    spec:
+      containers:
+        - name: company-app
+          image: confidencedev/companyservice
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+          env:
+            - name: CONFIG_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cm
+                  key: hostname
+            - name: USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cm
+                  key: username
+            - name: PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cm
+                  key: password
+            - name: EUREKA_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: companyservice-svc
+spec:
+  selector:
+    app: companyservice-app
+  ports:
+    - port: 80
+      targetPort: 8081

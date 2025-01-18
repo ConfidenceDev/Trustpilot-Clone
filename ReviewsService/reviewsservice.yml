@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviewsservice-app
+spec:
+  selector:
+    matchLabels:
+      app: reviewsservice-app
+  template:
+    metadata:
+      labels:
+        app: reviewsservice-app
+    spec:
+      containers:
+        - name: reviewsservice-app
+          image: confidencedev/reviewsservice
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+          env:
+            - name: CONFIG_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cm
+                  key: hostname
+            - name: USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cm
+                  key: username
+            - name: PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cm
+                  key: password
+            - name: EUREKA_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviewsservice-svc
+spec:
+  selector:
+    app: reviewsservice-app
+  ports:
+    - port: 80
+      targetPort: 8082
