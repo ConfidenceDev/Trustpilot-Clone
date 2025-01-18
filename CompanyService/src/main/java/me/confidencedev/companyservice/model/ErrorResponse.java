@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CompanyRequest {
-    private String companyName;
-    private String companyDescription;
-    private String companyOwner;
-    private String websiteUrl;
+public class ErrorResponse {
+    private String errorMessage;
+    private String errorCode;
 }

@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: COMPANY-SERVICE
+  config:
+    import: configserver:${CONFIG_SERVER:http://localhost:9296}
   h2:
     console:
       enabled: true
@@ -11,7 +13,7 @@ spring:
   datasource:
     url: jdbc:h2:mem:company
     username: sa
-    password: password
+    password:
     driverClassName: org.h2.Driver
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect

@@ -9,7 +9,7 @@ spring:
       server:
         git:
           uri: https://github.com/ConfidenceDev/spring-app-config
-          username: ${GITHUB_USERNAME:ConfidenceDev}
+          username: ${GITHUB_USERNAME}
           password: ${GITHUB_TOKEN}
           clone-on-start: true
 

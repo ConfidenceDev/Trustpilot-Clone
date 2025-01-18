@@ -1,0 +1,57 @@
+version: "3"
+services:
+  serviceregistry:
+    image: "confidencedev/serviceregistry"
+    container_name: serviceregistry
+    ports:
+      - "8761:8761"
+  configserver:
+    image: "confidencedev/configserver"
+    container_name: configserver
+    ports:
+      - "9296:9296"
+    environment:
+      - EUREKA_SERVER=http://serviceregistry:8761/eureka
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://configserver:9296/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - serviceregistry
+  cloudgateway:
+    image: "confidencedev/cloudgateway"
+    container_name: cloudgateway
+    ports:
+      - "9090:9090"
+    environment:
+      - EUREKA_SERVER=http://serviceregistry:8761/eureka
+      - CONFIG_SERVER=configserver
+    depends_on:
+      configserver:
+          condition: service_healthy
+  companyservice:
+    image: "confidencedev/companyservice"
+    container_name: companyservice
+    ports:
+      - "9090:9090"
+    environment:
+      - EUREKA_SERVER=http://serviceregistry:8761/eureka
+      - CONFIG_SERVER=configserver
+    depends_on:
+      configserver:
+        condition: service_healthy
+  reviewsservice:
+    image: "confidencedev/reviewsservice"
+    container_name: reviewsservice
+    ports:
+      - "9090:9090"
+    environment:
+      - EUREKA_SERVER=http://serviceregistry:8761/eureka
+      - CONFIG_SERVER=configserver
+    depends_on:
+      configserver:
+        condition: service_healthy
+
+#FROM K8S: EUREKA_SERVER=http://serviceregistry:8761/eureka
+#FROM Docker Network: EUREKA_SERVER=http://host.docker.internal:8761/eureka

@@ -3,6 +3,17 @@ server:
 
 spring:
   application:
-    name: Cloud-Gateway
+    name: API-GATEWAY
   config:
     import: configserver:${CONFIG_SERVER:http://localhost:9296}
+  cloud:
+    gateway:
+      routes:
+        - id: COMPANY-SERVICE
+          uri: lb://COMPANY-SERVICE
+          predicates:
+            - Path=/v1/company/**
+        - id: REVIEWS-SERVICE
+          uri: lb://REVIEWS-SERVICE
+          predicates:
+            - Path=/v1/reviews/**
