@@ -1,4 +1,9 @@
 version: "3"
+
+networks:
+  kafka-network:
+    driver: bridge
+
 services:
   serviceregistry:
     image: "confidencedev/serviceregistry"
@@ -29,7 +34,32 @@ services:
       - CONFIG_SERVER=configserver
     depends_on:
       configserver:
-          condition: service_healthy
+        condition: service_healthy
+
+  zookeeper:
+    image: ubuntu/zookeeper:3.8-22.04_edge
+    container_name: zookeeper
+    networks:
+      - kafka-network
+    ports:
+      - "2181:2181" # Expose Zookeeper's default port
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zookeeper:2888:3888
+
+  kafka:
+    image: ubuntu/kafka:3.6-22.04_edge
+    container_name: kafka
+    networks:
+      - kafka-network
+    ports:
+      - "9092:9092" # Expose Kafka's port
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+
   companyservice:
     image: "confidencedev/companyservice"
     container_name: companyservice
@@ -52,6 +82,5 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
-
 #FROM K8S: EUREKA_SERVER=http://serviceregistry:8761/eureka
 #FROM Docker Network: EUREKA_SERVER=http://host.docker.internal:8761/eureka

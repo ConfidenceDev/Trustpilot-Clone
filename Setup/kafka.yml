@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+  labels:
+    app: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: ubuntu/zookeeper:3.8-22.04_edge
+          ports:
+            - containerPort: 2181
+          env:
+            - name: ZOO_MY_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: zookeeper_id
+            - name: ZOO_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: zookeeper_server
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+spec:
+  ports:
+    - port: 2181
+      targetPort: 2181
+  selector:
+    app: zookeeper
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: ubuntu/kafka:3.6-22.04_edge
+          ports:
+            - containerPort: 9092
+          env:
+            - name: KAFKA_BROKER_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: kafka_broker_id
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: kafka_broker_id
+            - name: KAFKA_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: kafka_advertised_listeners
+            - name: KAFKA_LISTENERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: kafka_listeners
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+spec:
+  ports:
+    - port: 9092
+      targetPort: 9092
+  selector:
+    app: kafka
+  type: ClusterIP

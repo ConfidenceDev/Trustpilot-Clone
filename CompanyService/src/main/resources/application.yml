@@ -19,3 +19,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    customer:
+      bootstrap-servers: ${KAFKA_SERVER:http://localhost:9092}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      group-id: reviewers
+      auto-offset-rest: earliest

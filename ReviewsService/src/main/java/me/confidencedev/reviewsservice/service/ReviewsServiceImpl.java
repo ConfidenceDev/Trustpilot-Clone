@@ -6,11 +6,14 @@ import me.confidencedev.reviewsservice.model.ReviewsRequest;
 import me.confidencedev.reviewsservice.model.ReviewsResponse;
 import me.confidencedev.reviewsservice.repository.ReviewsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
+import static me.confidencedev.reviewsservice.constant.AppConstant.REVIEW_TOPIC;
 
 @Service
 @Log4j2
@@ -18,6 +21,13 @@ public class ReviewsServiceImpl implements ReviewsService{
 
     @Autowired
     private ReviewsRepository reviewsRepository;
+
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    public void pushReview(String review){
+        kafkaTemplate.send(REVIEW_TOPIC, review);
+    }
 
     @Override
     public String postReviews(ReviewsRequest reviewsRequest) {
@@ -35,6 +45,7 @@ public class ReviewsServiceImpl implements ReviewsService{
                 .build();
 
         reviewsRepository.save(reviews);
+        pushReview("NEW REVIEW: " + reviews.getComment());
         log.info("Review saved");
         return String.valueOf(reviews.getId());
     }

@@ -9,6 +9,7 @@ import me.confidencedev.companyservice.external.model.CompanyResponse;
 import me.confidencedev.companyservice.model.Rating;
 import me.confidencedev.companyservice.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,6 +25,11 @@ public class CompanyServiceImpl implements CompanyService{
 
     @Autowired
     private ReviewsService reviewsService;
+
+    @KafkaListener(topics = "reviews", groupId = "reviewers")
+    public void pullReview(String review){
+        log.info(review);
+    }
 
     @Override
     public String registerCompany(CompanyRequest companyRequest) {
