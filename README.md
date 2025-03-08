@@ -1,6 +1,6 @@
-# Trustpilot-Clone
+# Trustnote
 
-A trustpilot clone built with a microservice architecture in springboot with postgreSQL for database, jenkins for CI/CD, containerized with docker and managed with kubernetes to run on Azure cloud
+Trustnote is a product, service, business and company review platform similar to trustpilot built with a microservice architecture in springboot with postgreSQL for database, jenkins for CI/CD, containerized with docker and managed with kubernetes to run on Azure cloud
 
 ## Table of Contents
 
